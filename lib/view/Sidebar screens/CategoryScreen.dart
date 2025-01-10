@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart'; // For kIsWeb
 import 'package:flutter/services.dart';
+import 'package:online_shopping_dashboad/Controller/Category%20controller.dart';
 
 class Categoryscreen extends StatefulWidget {
   static const String id = 'category_screen';
@@ -17,7 +18,10 @@ class _CategoryscreenState extends State<Categoryscreen> {
   File? _imageFile;
   Uint8List? _imageBytes;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late String _categoryName;
+
+  final CategoryController _categorycontroller = CategoryController();
+
+  late String name;
 
   pickImage() async {
     try {
@@ -50,8 +54,8 @@ class _CategoryscreenState extends State<Categoryscreen> {
 ///////
   File? _imageFile2;
   Uint8List? _imageBytes2;
-  
- pickBannerImage() async {
+
+  pickBannerImage() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.image,
@@ -78,9 +82,11 @@ class _CategoryscreenState extends State<Categoryscreen> {
       print("Error picking file: $e");
     }
   }
+
   @override
   Widget build(BuildContext context) {
-    return Form(key: _formKey,
+    return Form(
+      key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -130,25 +136,36 @@ class _CategoryscreenState extends State<Categoryscreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: SizedBox(
                   width: 200,
-                  child: TextFormField(validator: (value){
-                    if(value!.isNotEmpty){
-                      return null;
-                    }else{
-                      return 'Please enter category name';
-                    }
-                  },onChanged: (value) {
-                    _categoryName=value;
-                  },
-                    decoration: InputDecoration(labelText: 'Enter Category Name'),
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value!.isNotEmpty) {
+                        return null;
+                      } else {
+                        return 'Please enter category name';
+                      }
+                    },
+                    onChanged: (value) {
+                      name = value;
+                    },
+                    decoration:
+                        InputDecoration(labelText: 'Enter Category Name'),
                   ),
                 ),
               ),
               TextButton(onPressed: () {}, child: Text("Cancel")),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                onPressed: () {if(_formKey.currentState!.validate()){
-                 print("from textfielsd  $_categoryName");
-                }},
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _categorycontroller.uploadCategory(
+                      pickedImage: _imageFile,
+                      pickedBanner: _imageFile2,
+                      pickedImageBytes: _imageBytes,
+                      pickedBannerBytes: _imageBytes2, name: name, context: context,
+                    );
+                    print("Category Name: $name");
+                  }
+                },
                 child: Text(
                   "Save",
                   style: TextStyle(color: Colors.white),
@@ -174,51 +191,51 @@ class _CategoryscreenState extends State<Categoryscreen> {
             child: Divider(color: Colors.grey),
           ),
           Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  height: 150,
-                  width: 150,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Center(
-                    child:_imageBytes2 != null
-                        ? Image.memory(
-                            _imageBytes2!,
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              height: 150,
+              width: 150,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: _imageBytes2 != null
+                    ? Image.memory(
+                        _imageBytes2!,
+                        fit: BoxFit.cover,
+                        width: 150,
+                        height: 150,
+                      )
+                    : _imageFile2 != null
+                        ? Image.file(
+                            _imageFile2!,
                             fit: BoxFit.cover,
                             width: 150,
                             height: 150,
                           )
-                        : _imageFile2 != null
-                            ? Image.file(
-                                _imageFile2!,
-                                fit: BoxFit.cover,
-                                width: 150,
-                                height: 150,
-                              )
-                            :  Text(
-                                "Category Banner",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                  ),
-                ),  
+                        : Text(
+                            "Category Banner",
+                            style: TextStyle(color: Colors.white),
+                          ),
               ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                                    onPressed: () {
-                                      pickBannerImage();
-                                    },
-                                    child: Text(
-                    "Pick image",
-                    style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                  ),
-                    Padding(
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+              onPressed: () {
+                pickBannerImage();
+              },
+              child: Text(
+                "Pick image",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+          Padding(
             padding: const EdgeInsets.all(8.0),
             child: Divider(color: Colors.grey),
           ),
@@ -227,3 +244,4 @@ class _CategoryscreenState extends State<Categoryscreen> {
     );
   }
 }
+  
