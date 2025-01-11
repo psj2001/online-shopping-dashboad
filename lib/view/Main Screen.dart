@@ -8,6 +8,8 @@ import 'package:online_shopping_dashboad/view/Sidebar%20screens/ProductScreen.da
 import 'package:online_shopping_dashboad/view/Sidebar%20screens/UploadBannerScreen.dart';
 import 'package:online_shopping_dashboad/view/Sidebar%20screens/Vesndors%20Screen.dart';
 
+import 'Sidebar screens/subcategory screen.dart';
+
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -39,6 +41,9 @@ class _MainScreenState extends State<MainScreen> {
           break;
         case ProductScreen.id:
           _selectedScreen = const ProductScreen();
+          break;
+           case Subcategoryscreen.id:
+          _selectedScreen = const Subcategoryscreen();
           break;
         default:
           _selectedScreen = const Vesndorsscreen();
@@ -92,6 +97,7 @@ class _MainScreenState extends State<MainScreen> {
             route: Categoryscreen.id,
             icon: Icons.category,
           ),
+        
           AdminMenuItem(
             title: 'Upload Banners',
             route: Uploadbannerscreen.id,
@@ -100,7 +106,12 @@ class _MainScreenState extends State<MainScreen> {
           AdminMenuItem(
             title: 'Products',
             route: ProductScreen.id,
-            icon: Icons.stop,
+            icon: Icons.store,
+          ),  
+           AdminMenuItem(
+            title: 'Sub category',
+            route: Subcategoryscreen.id,
+            icon: Icons.category_outlined,
           ),
         ],
         selectedRoute: Vesndorsscreen.id,
