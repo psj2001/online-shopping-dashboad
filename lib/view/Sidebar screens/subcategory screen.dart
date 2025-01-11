@@ -6,8 +6,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:online_shopping_dashboad/view/Sidebar%20screens/widgets/SubcategoryWidget.dart';
 
 import '../../Controller/Category controller.dart';
+import '../../Controller/Subcategory controller.dart';
 import '../../model/category model.dart';
 
 class Subcategoryscreen extends StatefulWidget {
@@ -19,12 +21,13 @@ class Subcategoryscreen extends StatefulWidget {
 }
 
 class _SubcategoryscreenState extends State<Subcategoryscreen> {
+  final SubCategoryController subCategoryController = SubCategoryController();
   late Future<List<Category>> futureCategories;
   Category? selectedCategory;
   File? _imageFile;
   Uint8List? _imageBytes;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late String name;
+  late String subcategoryname;
 
   @override
   void initState() {
@@ -41,11 +44,12 @@ class _SubcategoryscreenState extends State<Subcategoryscreen> {
       if (result != null) {
         if (foundation.kIsWeb) {
           setState(() {
-            _imageBytes = result.files.single.bytes;
+            _imageBytes = result.files.single.bytes; // Non-null for web
           });
         } else {
           setState(() {
-            _imageFile = File(result.files.single.path!);
+            _imageFile =
+                File(result.files.single.path!); // Non-null for non-web
           });
         }
       } else {
@@ -151,7 +155,7 @@ class _SubcategoryscreenState extends State<Subcategoryscreen> {
                           return null;
                         },
                         onChanged: (value) {
-                          name = value;
+                          subcategoryname = value;
                         },
                         decoration: const InputDecoration(
                           labelText: 'Enter Subcategory Name',
@@ -167,7 +171,7 @@ class _SubcategoryscreenState extends State<Subcategoryscreen> {
                               setState(() {
                                 _imageFile = null;
                                 _imageBytes = null;
-                                name = '';
+                                subcategoryname = '';
                               });
                               log("Form reset");
                             },
@@ -175,34 +179,53 @@ class _SubcategoryscreenState extends State<Subcategoryscreen> {
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async{
                               if (_formKey.currentState!.validate()) {
-                                log("Subcategory Name: $name");
-                                // Implement save functionality
+                                log("Subcategory Name: $subcategoryname");
+                            await    subCategoryController.uploadSubcategory(
+                                  categoryId: selectedCategory!.id,
+                                  categoryName: selectedCategory!.name,
+                                  pickedImage: foundation.kIsWeb
+                                      ? _imageBytes
+                                      : _imageFile?.readAsBytesSync(),
+                                  subCategoryName: subcategoryname,
+                                  context: context,
+                                );
+                              setState(() {
+                                _formKey.currentState!.reset();
+                                _imageFile=null;
+                                _imageBytes=null;
+                                selectedCategory = null;
+                              });
                               }
                             },
                             child: const Text("Save"),
                           ),
                         ],
-                      ), Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                onPressed: () {
-                  pickImage();
-                },
-                child: Text(
-                  "Upload Photo",
-                  style: TextStyle(color: Colors.white),
-                ), 
-              ),
-            ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue),
+                          onPressed: () {
+                            pickImage();
+                          },
+                          child: Text(
+                            "Upload Photo",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
             ],
           ),
+          SizedBox(height: 20,),
+          const Divider(color: Colors.grey),
+          Subcategorywidget(), 
         ],
       ),
     );
