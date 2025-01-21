@@ -58,7 +58,7 @@ class _SubcategorywidgetState extends State<Subcategorywidget> {
                         children: [
                           Image.network(
                             category.image,
-                            height: 80, // Adjusted height
+                            height: 70, // Adjusted height
                             width: 80, // Adjusted width
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
